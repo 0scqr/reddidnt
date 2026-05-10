@@ -1,0 +1,54 @@
+[
+  {
+    "id": 1,
+    "post_id": 100,
+    "parent_id": null,
+    "content": "¡Este es un comentario de primer nivel! Me encanta el diseño Soft Pink.",
+    "author": "Alice",
+    "upvotes": 15,
+    "created_at": "2026-05-03T10:00:00Z",
+    "replies": [
+      {
+        "id": 2,
+        "post_id": 100,
+        "parent_id": 1,
+        "content": "Totalmente de acuerdo, le da un toque muy moderno y minimalista.",
+        "author": "Bob",
+        "upvotes": 5,
+        "created_at": "2026-05-03T10:15:00Z",
+        "replies": [
+          {
+            "id": 3,
+            "post_id": 100,
+            "parent_id": 2,
+            "content": "¡Sí! Y la recursividad funciona perfecto para hilos profundos. (Nivel 3)",
+            "author": "Charlie",
+            "upvotes": 8,
+            "created_at": "2026-05-03T10:30:00Z",
+            "replies": []
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "post_id": 100,
+        "parent_id": 1,
+        "content": "A mí también me gusta. Excelente trabajo. (Nivel 2)",
+        "author": "David",
+        "upvotes": 3,
+        "created_at": "2026-05-03T10:45:00Z",
+        "replies": []
+      }
+    ]
+  },
+  {
+    "id": 5,
+    "post_id": 100,
+    "parent_id": null,
+    "content": "Otro comentario principal independiente para verificar la renderización de múltiples raíces.",
+    "author": "Eve",
+    "upvotes": 20,
+    "created_at": "2026-05-03T11:00:00Z",
+    "replies": []
+  }
+]
