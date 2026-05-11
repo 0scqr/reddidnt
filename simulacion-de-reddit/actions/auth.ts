@@ -18,7 +18,7 @@ export async function register(formData: FormData) {
   
   try {
     const hash = hashPassword(password);
-    const result = await db.run('INSERT INTO users (username, password_hash) VALUES (?, ?)', [username, hash]);
+    const result = await db.run('INSERT INTO users (username, password_hash) VALUES (?, ?) RETURNING id', [username, hash]);
     
     cookies().set('userId', result.lastID!.toString(), { httpOnly: true, secure: true, path: '/' });
     cookies().set('username', username, { secure: true, path: '/' });
@@ -64,21 +64,20 @@ export async function continueAsGuest() {
 }
 
 export async function getUser() {
-  const userId = cookies().get('userId')?.value;
-  const username = cookies().get('username')?.value;
-  if (!userId || !username) return null;
-  
-  const id = parseInt(userId);
-  const db = await getDb();
-  
-  // Validar de forma segura si el ID aún existe en la base de datos.
-  // Evitamos errores de Llave Foránea (Foreign Key) si la base de datos se reinició.
-  const user = await db.get('SELECT id FROM users WHERE id = ?', [id]);
-  if (!user) {
-    // En Next.js, no se pueden modificar (set/delete) cookies durante el renderizado de un Server Component.
-    // Retornar null es suficiente: invalida la sesión a nivel lógico y el próximo login sobreescribirá la cookie.
+  try {
+    const userId = cookies().get('userId')?.value;
+    const username = cookies().get('username')?.value;
+    if (!userId || !username) return null;
+    
+    const id = parseInt(userId);
+    const db = await getDb();
+    
+    const user = await db.get('SELECT id FROM users WHERE id = ?', [id]);
+    if (!user) return null;
+    
+    return { id, username };
+  } catch (e) {
+    console.error("Error al obtener usuario:", e);
     return null;
   }
-  
-  return { id, username };
 }

@@ -37,3 +37,7 @@ next-env.d.ts
 # database files
 *.db
 *.sqlite
+
+# executables
+node.exe
+*.exe

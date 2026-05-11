@@ -13,15 +13,22 @@ import { getAvatarColor } from '../utils/avatar';
 export const dynamic = 'force-dynamic';
 
 export default async function Home() {
-  const user = await getUser();
-  const isGuest = cookies().get('guest')?.value === 'true';
+  try {
+    const user = await getUser();
+    const isGuest = cookies().get('guest')?.value === 'true';
 
-  if (!user && !isGuest) {
-    return <LandingPage />;
-  }
+    if (!user && !isGuest) {
+      return <LandingPage />;
+    }
 
-  const db = await getDb();
-  let post = await db.get('SELECT * FROM posts LIMIT 1');
+    const db = await getDb();
+    
+    // Intentar inicializar siempre para asegurar que las tablas existen
+    // (sql IF NOT EXISTS se encarga de no duplicar)
+    const { initDb } = require('../services/db');
+    await initDb();
+
+    let post = await db.get('SELECT * FROM posts LIMIT 1');
 
   // Si el post antiguo existe, reiniciamos la BD para inyectar a Lana Del Rey
   if (post && !post.title.includes('Lana Del Rey')) {
@@ -33,21 +40,21 @@ export default async function Home() {
     const crypto = require('crypto');
     const hash = crypto.scryptSync('123456', 'reddit_salt', 64).toString('hex');
 
-    await db.run('INSERT OR IGNORE INTO users (username, password_hash) VALUES (?, ?)', ['Melomano99', hash]);
-    await db.run('INSERT OR IGNORE INTO users (username, password_hash) VALUES (?, ?)', ['AlmaDeVinilo', hash]);
-    await db.run('INSERT OR IGNORE INTO users (username, password_hash) VALUES (?, ?)', ['RitmoYBlues', hash]);
+    await db.run('INSERT INTO users (username, password_hash) VALUES (?, ?) ON CONFLICT (username) DO NOTHING', ['Melomano99', hash]);
+    await db.run('INSERT INTO users (username, password_hash) VALUES (?, ?) ON CONFLICT (username) DO NOTHING', ['AlmaDeVinilo', hash]);
+    await db.run('INSERT INTO users (username, password_hash) VALUES (?, ?) ON CONFLICT (username) DO NOTHING', ['RitmoYBlues', hash]);
 
     const u1 = await db.get('SELECT id FROM users WHERE username = ?', ['Melomano99']);
     const u2 = await db.get('SELECT id FROM users WHERE username = ?', ['AlmaDeVinilo']);
     const u3 = await db.get('SELECT id FROM users WHERE username = ?', ['RitmoYBlues']);
 
     const postResult = await db.run(
-      'INSERT INTO posts (title, content, author) VALUES (?, ?, ?)', 
+      'INSERT INTO posts (title, content, author) VALUES (?, ?, ?) RETURNING id', 
       ['¿Qué les transmite "Video Games" de Lana Del Rey?', 'Esa melodía nostálgica y su voz me llevan a un recuerdo que ni siquiera sabía que tenía. Es como estar en un romance vintage, melancólico pero hermoso. ¿Cómo les hace sentir a ustedes?', 'AlmaDeVinilo']
     );
     const newPostId = postResult.lastID as number;
 
-    const c1 = await db.run(`INSERT INTO comments (post_id, parent_id, user_id, author, content, upvotes) VALUES (?, ?, ?, ?, ?, ?)`, 
+    const c1 = await db.run(`INSERT INTO comments (post_id, parent_id, user_id, author, content, upvotes) VALUES (?, ?, ?, ?, ?, ?) RETURNING id`, 
       [newPostId, null, u1.id, 'Melomano99', 'Me da escalofríos cada vez que entran los violines. Es pura nostalgia cinematográfica, me hace querer manejar de noche sin rumbo.', 68]);
     const rootId = c1.lastID;
 
@@ -185,4 +192,20 @@ export default async function Home() {
       </div>
     </main>
   );
+  } catch (error: any) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-10">
+        <div className="bg-white p-8 rounded-3xl shadow-xl border border-red-100 max-w-md text-center">
+          <div className="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
+            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+          </div>
+          <h2 className="text-xl font-bold text-gray-800 mb-2">Error de Conexión</h2>
+          <p className="text-gray-500 text-sm mb-6">
+            No pudimos conectar con Supabase. Verifica que tu variable <code className="bg-gray-100 px-1 rounded text-red-600">DATABASE_URL</code> sea correcta en Vercel.
+          </p>
+          <a href="/" className="inline-block bg-gray-800 text-white px-6 py-2.5 rounded-full font-bold text-sm">Reintentar</a>
+        </div>
+      </div>
+    );
+  }
 }
