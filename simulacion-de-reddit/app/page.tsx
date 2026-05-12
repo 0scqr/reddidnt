@@ -17,6 +17,10 @@ export default async function Home() {
     const user = await getUser();
     const isGuest = cookies().get('guest')?.value === 'true';
 
+    if (!user && !isGuest) {
+      return <LandingPage />;
+    }
+
     const db = await getDb();
     
     // Intentar inicializar siempre para asegurar que las tablas existen

@@ -21,20 +21,22 @@ export default function LandingPage() {
                </svg>
              </div>
              <h1 className="text-3xl font-bold text-gray-800 mb-3 tracking-tight">Reddidn&apos;t</h1>
-             <p className="text-gray-500 mb-10 text-[15px] font-medium leading-relaxed">Donde la música y tus emociones convergen en un solo lugar.</p>
+             <p className="text-gray-500 mb-10 text-[15px] font-medium leading-relaxed px-4">Donde la música y tus emociones convergen en un solo lugar.</p>
              
              <div className="flex flex-col gap-4">
-               <button onClick={() => setView('auth')} className="bg-gradient-to-r from-gray-800 to-gray-900 text-white font-bold py-4 rounded-3xl shadow-md hover:shadow-lg transition-all hover:-translate-y-1">
+               <button onClick={() => setView('auth')} className="bg-gradient-to-r from-gray-800 to-gray-900 text-white font-bold py-4 rounded-3xl shadow-md hover:shadow-lg transition-all active:scale-95">
                  Entrar a la Comunidad
                </button>
-               <button onClick={async () => { await continueAsGuest(); window.location.reload(); }} className="bg-white/80 text-gray-600 font-bold py-4 rounded-3xl shadow-sm border border-gray-200 hover:bg-white hover:text-gray-800 transition-all">
-                 Explorar como Invitado
-               </button>
+               <form action={async () => { await continueAsGuest(); }} className="w-full">
+                 <button type="submit" className="w-full bg-white/80 text-gray-600 font-bold py-4 rounded-3xl shadow-sm border border-gray-200 hover:bg-white hover:text-gray-800 transition-all active:scale-95">
+                   Explorar como Invitado
+                 </button>
+               </form>
              </div>
            </div>
          ) : (
            <div className="animate-in fade-in slide-in-from-right-4 duration-300 relative text-left">
-             <button onClick={() => setView('options')} className="absolute -top-4 -left-4 text-gray-500 hover:text-gray-900 flex items-center gap-1 text-sm font-bold transition-colors z-20 bg-white/60 backdrop-blur-md px-3 py-1.5 rounded-full shadow-sm">
+             <button onClick={() => setView('options')} className="absolute -top-4 -left-4 text-gray-500 hover:text-gray-900 flex items-center gap-1 text-sm font-bold transition-colors z-20 bg-white/60 backdrop-blur-md px-3 py-1.5 rounded-full shadow-sm active:scale-90">
                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M15 19l-7-7 7-7" /></svg>
                Volver
              </button>

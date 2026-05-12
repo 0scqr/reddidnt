@@ -103,7 +103,7 @@ export default function AuthForm() {
         <button 
           type="submit" 
           disabled={loading}
-          className="bg-gray-800 text-white font-bold py-3.5 mt-2 rounded-2xl shadow-md hover:bg-gray-900 transition-all disabled:opacity-50 hover:-translate-y-0.5"
+          className="bg-gray-800 text-white font-bold py-3.5 mt-2 rounded-2xl shadow-md hover:bg-gray-900 transition-all disabled:opacity-50 hover:-translate-y-0.5 active:scale-95"
         >
           {loading ? 'Sincronizando...' : (isLogin ? 'Acceder' : 'Crear Cuenta')}
         </button>
