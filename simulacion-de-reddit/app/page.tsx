@@ -30,12 +30,7 @@ export default async function Home() {
 
     let post = await db.get('SELECT * FROM posts LIMIT 1');
 
-  // Si el post antiguo existe, reiniciamos la BD para inyectar a Lana Del Rey
-  if (post && !post.title.includes('Lana Del Rey')) {
-    await db.exec('DELETE FROM comments; DELETE FROM posts; DELETE FROM users;');
-    post = null;
-  }
-
+  // Solo inyectamos datos iniciales si no hay ningún post en la base de datos
   if (!post) {
     const crypto = require('crypto');
     const hash = crypto.scryptSync('123456', 'reddit_salt', 64).toString('hex');
