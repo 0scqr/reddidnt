@@ -27,7 +27,7 @@ export default async function Home() {
     const { initDb } = require('../services/db');
     await initDb();
 
-    let post = await db.get('SELECT * FROM posts LIMIT 1');
+    let post = await db.get('SELECT * FROM posts ORDER BY id ASC LIMIT 1');
 
     // Solo inyectamos datos iniciales si no hay ningún post en la base de datos
     if (!post) {
